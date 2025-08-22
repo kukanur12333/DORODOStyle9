@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, Lock, MapPin, User, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { CreditCard, Lock, MapPin, User, ShieldCheck, ArrowLeft, Bitcoin } from 'lucide-react';
 import { Button } from '../components/atoms/Button';
 import { Input } from '../components/atoms/Input';
 import { useApp } from '../context/AppContext';
+import { OrderSummary } from '../components/molecules/OrderSummary';
+import { Logo } from '../components/atoms/Logo';
 
 export const CheckoutPage: React.FC = () => {
   const { state } = useApp();
   const [currentStep, setCurrentStep] = useState(1);
+  const [shippingMethod, setShippingMethod] = useState('standard');
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const [formData, setFormData] = useState({
     email: state.user?.email || '',
-    firstName: '',
-    lastName: '',
+    firstName: state.user?.name.split(' ')[0] || '',
+    lastName: state.user?.name.split(' ')[1] || '',
     address: '',
     city: '',
     zipCode: '',
@@ -23,9 +28,9 @@ export const CheckoutPage: React.FC = () => {
   });
 
   const steps = [
-    { id: 1, title: 'Information', icon: <User size={18} /> },
-    { id: 2, title: 'Shipping', icon: <MapPin size={18} /> },
-    { id: 3, title: 'Payment', icon: <CreditCard size={18} /> },
+    { id: 1, title: 'Information' },
+    { id: 2, title: 'Shipping' },
+    { id: 3, title: 'Payment' },
   ];
 
   const handleInputChange = (field: string, value: string) => {
@@ -35,6 +40,10 @@ export const CheckoutPage: React.FC = () => {
   const handleNextStep = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
+    } else {
+      // Handle final submission
+      console.log('Order submitted!', formData);
+      // Here you would typically navigate to an order confirmation page
     }
   };
 
@@ -43,233 +52,127 @@ export const CheckoutPage: React.FC = () => {
       setCurrentStep(currentStep - 1);
     }
   };
+  
+  const shippingOptions = [
+    { id: 'standard', title: 'Standard Shipping', price: 0, eta: '5-7 business days' },
+    { id: 'express', title: 'Express Shipping', price: 15, eta: '2-3 business days' },
+  ];
+
+  const selectedShippingCost = shippingOptions.find(opt => opt.id === shippingMethod)?.price ?? 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Checkout Form */}
-          <div>
-            <h1 className="text-3xl font-bold font-montserrat mb-8">Checkout</h1>
-
-            {/* Progress Steps */}
-            <div className="flex items-center mb-8">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div
-                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                      currentStep >= step.id
-                        ? 'bg-primary-black border-primary-black text-white'
-                        : 'bg-white border-gray-300 text-gray-500'
-                    }`}
-                  >
-                    {step.icon}
-                  </div>
-                  <span
-                    className={`ml-2 font-montserrat font-medium ${
-                      currentStep >= step.id ? 'text-gray-900' : 'text-gray-500'
-                    }`}
-                  >
-                    {step.title}
-                  </span>
-                  {index < steps.length - 1 && (
-                    <div
-                      className={`w-16 h-px mx-4 ${
-                        currentStep > step.id ? 'bg-primary-black' : 'bg-gray-300'
-                      }`}
-                    />
-                  )}
+    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row font-poppins">
+      {/* Left side - Form */}
+      <div className="w-full lg:w-3/5 p-8 sm:p-12 lg:p-16 overflow-y-auto order-2 lg:order-1">
+        <div className="max-w-xl mx-auto">
+          <Link to="/" className="flex items-center gap-2 group mb-8">
+            <Logo className="w-8 h-8 text-primary-black group-hover:text-primary-gold transition-colors" />
+            <span className="font-montserrat font-bold text-2xl text-gray-800">DORODOStyle</span>
+          </Link>
+          <nav className="flex items-center text-sm mb-10">
+            {steps.map((step, index) => (
+              <React.Fragment key={step.id}>
+                <span className={`transition-colors ${currentStep >= step.id ? 'text-primary-black font-semibold' : 'text-gray-500'}`}>
+                  {step.title}
+                </span>
+                {index < steps.length - 1 && <span className="mx-2 text-gray-400">&gt;</span>}
+              </React.Fragment>
+            ))}
+          </nav>
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {currentStep === 1 && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold font-montserrat">Contact Information</h2>
+                  <p className="text-sm">
+                    Already have an account? <Link to="/login" className="text-primary-gold hover:underline font-semibold">Log in</Link>
+                  </p>
                 </div>
-              ))}
-            </div>
-
-            {/* Step Content */}
-            <div className="bg-white rounded-2xl shadow-luxury p-8">
-              {currentStep === 1 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-xl font-bold font-montserrat mb-4">Contact Information</h2>
-                  
-                  <Input
-                    label="Email address"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    required
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      label="First name"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      required
-                    />
-                    <Input
-                      label="Last name"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      required
-                    />
+                <Input label="Email address" type="email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} required icon={<User size={16} />} />
+                <h2 className="text-xl font-bold font-montserrat pt-4">Shipping Address</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input label="First name" value={formData.firstName} onChange={(e) => handleInputChange('firstName', e.target.value)} required />
+                  <Input label="Last name" value={formData.lastName} onChange={(e) => handleInputChange('lastName', e.target.value)} required />
+                </div>
+                <Input label="Address" value={formData.address} onChange={(e) => handleInputChange('address', e.target.value)} required icon={<MapPin size={16} />} />
+                <div className="grid grid-cols-2 gap-4">
+                  <Input label="City" value={formData.city} onChange={(e) => handleInputChange('city', e.target.value)} required />
+                  <Input label="ZIP Code" value={formData.zipCode} onChange={(e) => handleInputChange('zipCode', e.target.value)} required />
+                </div>
+                <Input label="Country" value={formData.country} onChange={(e) => handleInputChange('country', e.target.value)} required />
+              </div>
+            )}
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-bold font-montserrat">Shipping Method</h2>
+                <div className="space-y-4">
+                  {shippingOptions.map(option => (
+                    <label key={option.id} className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${shippingMethod === option.id ? 'border-primary-black ring-2 ring-primary-black' : 'border-gray-300'}`}>
+                      <input type="radio" name="shippingMethod" value={option.id} checked={shippingMethod === option.id} onChange={(e) => setShippingMethod(e.target.value)} className="w-4 h-4 text-primary-gold focus:ring-primary-gold" />
+                      <div className="ml-4 flex-1">
+                        <p className="font-semibold">{option.title}</p>
+                        <p className="text-sm text-gray-500">{option.eta}</p>
+                      </div>
+                      <p className="font-semibold">{option.price > 0 ? `$${option.price.toFixed(2)}` : 'Free'}</p>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-bold font-montserrat">Payment</h2>
+                <p className="text-sm text-gray-500">All transactions are secure and encrypted.</p>
+                <div className="flex border border-gray-200 rounded-lg p-1 bg-gray-100">
+                  {[{id: 'card', icon: <CreditCard size={16} />, label: 'Card'}, {id: 'paypal', icon: <span className="font-bold italic text-[#003087]">P</span>, label: 'PayPal'}, {id: 'crypto', icon: <Bitcoin size={16} />, label: 'Crypto'}].map(method => (
+                    <button key={method.id} onClick={() => setPaymentMethod(method.id)} className={`flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors capitalize flex items-center justify-center gap-2 ${paymentMethod === method.id ? 'bg-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
+                      {method.icon}
+                      {method.label}
+                    </button>
+                  ))}
+                </div>
+                {paymentMethod === 'card' && (
+                  <div className="space-y-4 pt-4">
+                    <Input label="Card number" value={formData.cardNumber} onChange={(e) => handleInputChange('cardNumber', e.target.value)} placeholder="1234 5678 9012 3456" required icon={<CreditCard size={16} />} />
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input label="Expiry date" value={formData.expiryDate} onChange={(e) => handleInputChange('expiryDate', e.target.value)} placeholder="MM/YY" required />
+                      <Input label="CVV" value={formData.cvv} onChange={(e) => handleInputChange('cvv', e.target.value)} placeholder="123" required icon={<Lock size={16} />} />
+                    </div>
+                    <Input label="Name on card" value={formData.nameOnCard} onChange={(e) => handleInputChange('nameOnCard', e.target.value)} required />
                   </div>
-                </motion.div>
-              )}
-
-              {currentStep === 2 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-xl font-bold font-montserrat mb-4">Shipping Address</h2>
-                  
-                  <Input
-                    label="Address"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    required
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      label="City"
-                      value={formData.city}
-                      onChange={(e) => handleInputChange('city', e.target.value)}
-                      required
-                    />
-                    <Input
-                      label="ZIP Code"
-                      value={formData.zipCode}
-                      onChange={(e) => handleInputChange('zipCode', e.target.value)}
-                      required
-                    />
+                )}
+                {paymentMethod === 'paypal' && (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg">
+                    <Button variant="primary" className="bg-[#0070ba] hover:bg-[#005ea6]">Continue with PayPal</Button>
                   </div>
-                  
-                  <Input
-                    label="Country"
-                    value={formData.country}
-                    onChange={(e) => handleInputChange('country', e.target.value)}
-                    required
-                  />
-                </motion.div>
-              )}
-
-              {currentStep === 3 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-xl font-bold font-montserrat mb-4">Payment Information</h2>
-                  
-                  <Input
-                    label="Card number"
-                    value={formData.cardNumber}
-                    onChange={(e) => handleInputChange('cardNumber', e.target.value)}
-                    placeholder="1234 5678 9012 3456"
-                    required
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      label="Expiry date"
-                      value={formData.expiryDate}
-                      onChange={(e) => handleInputChange('expiryDate', e.target.value)}
-                      placeholder="MM/YY"
-                      required
-                    />
-                    <Input
-                      label="CVV"
-                      value={formData.cvv}
-                      onChange={(e) => handleInputChange('cvv', e.target.value)}
-                      placeholder="123"
-                      required
-                    />
+                )}
+                {paymentMethod === 'crypto' && (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg">
+                    <Button variant="primary">Pay with Crypto Wallet</Button>
                   </div>
-                  
-                  <Input
-                    label="Name on card"
-                    value={formData.nameOnCard}
-                    onChange={(e) => handleInputChange('nameOnCard', e.target.value)}
-                    required
-                  />
-
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Lock size={16} />
-                    <span>Your payment information is secure and encrypted</span>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Navigation Buttons */}
-              <div className="flex justify-between mt-8">
-                <Button
-                  variant="outline"
-                  onClick={handlePrevStep}
-                  disabled={currentStep === 1}
-                >
-                  Previous
-                </Button>
-                
-                {currentStep < 3 ? (
-                  <Button variant="primary" onClick={handleNextStep}>
-                    Next
-                  </Button>
-                ) : (
-                  <Button variant="gold" size="lg">
-                    Complete Order
-                  </Button>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Order Summary */}
-          <div>
-            <div className="bg-white rounded-2xl shadow-luxury p-8 sticky top-8">
-              <h2 className="text-xl font-bold font-montserrat mb-6">Order Summary</h2>
-              
-              {/* Order items would go here */}
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>$459.97</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>$36.80</span>
-                </div>
-                <hr />
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span>$496.77</span>
-                </div>
-              </div>
-
-              {/* Security badges */}
-              <div className="pt-6 border-t">
-                <p className="text-sm text-gray-600 mb-4">Secure checkout powered by:</p>
-                <div className="flex items-center gap-6 text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <CreditCard size={20} />
-                    <span className="font-semibold">Stripe</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck size={20} />
-                    <span className="font-semibold">SSL Secure</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
+          </motion.div>
+          <div className="flex items-center justify-between mt-10">
+            <button onClick={handlePrevStep} className={`flex items-center gap-2 text-sm text-gray-600 hover:text-primary-black transition-opacity ${currentStep === 1 ? 'opacity-0 cursor-default' : 'opacity-100'}`}>
+              <ArrowLeft size={16} />
+              Return
+            </button>
+            <Button variant="primary" size="lg" onClick={handleNextStep} className="group">
+              {currentStep === 1 ? 'Continue to Shipping' : currentStep === 2 ? 'Continue to Payment' : 'Place Order'}
+              {currentStep === 3 && <motion.span whileTap={{ scale: 1.2 }} className="ml-2">🚀</motion.span>}
+            </Button>
           </div>
         </div>
+      </div>
+      <div className="w-full lg:w-2/5 bg-gray-100 p-8 sm:p-12 lg:p-16 order-1 lg:order-2">
+        <OrderSummary shippingCost={selectedShippingCost} />
       </div>
     </div>
   );

@@ -18,7 +18,8 @@ type AppAction =
   | { type: 'TOGGLE_WISHLIST'; payload: string }
   | { type: 'SET_PRODUCTS'; payload: Product[] }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'TOGGLE_COMMAND_PALETTE' };
+  | { type: 'TOGGLE_COMMAND_PALETTE' }
+  | { type: 'ADD_LOYALTY_POINTS'; payload: number };
 
 const initialState: AppState = {
   user: {
@@ -81,6 +82,15 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, isLoading: action.payload };
     case 'TOGGLE_COMMAND_PALETTE':
       return { ...state, isCommandPaletteOpen: !state.isCommandPaletteOpen };
+    case 'ADD_LOYALTY_POINTS':
+      if (!state.user) return state;
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          loyaltyPoints: state.user.loyaltyPoints + action.payload,
+        },
+      };
     default:
       return state;
   }

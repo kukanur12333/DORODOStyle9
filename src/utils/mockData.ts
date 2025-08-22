@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Product, User, Order, BlogPost, Review } from '../types';
+import { MEMBERSHIP_TIERS } from './constants';
 
 export function generateMockProducts(count: number): Product[] {
   const categories = ['Coats', 'Clothing', 'Accessories', 'Shoes', 'Bags', 'Jewelry', 'Beauty'];
@@ -53,4 +54,26 @@ export function generateMockReviews(count: number): Review[] {
   }));
 }
 
-// ... rest of the file
+export interface LeaderboardUser {
+  id: string;
+  rank: number;
+  name: string;
+  avatar: string;
+  points: number;
+  tier: keyof typeof MEMBERSHIP_TIERS;
+}
+
+export function generateMockLeaderboardUsers(count: number): LeaderboardUser[] {
+  const tierKeys = Object.keys(MEMBERSHIP_TIERS) as (keyof typeof MEMBERSHIP_TIERS)[];
+  
+  return Array.from({ length: count }, () => ({
+    id: faker.string.uuid(),
+    rank: 0, // Will be set after sorting
+    name: faker.person.fullName(),
+    avatar: faker.image.avatar(),
+    points: faker.number.int({ min: 1000, max: 25000 }),
+    tier: faker.helpers.arrayElement(tierKeys),
+  }))
+  .sort((a, b) => b.points - a.points)
+  .map((user, index) => ({ ...user, rank: index + 1 }));
+}

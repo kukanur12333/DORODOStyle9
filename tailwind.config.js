@@ -49,6 +49,12 @@ module.exports = {
         '84': '21rem',
         '96': '24rem',
       },
+      backgroundImage: {
+        'grid-pattern': "linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        'grid-size': '2rem 2rem',
+      },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-in-out',
@@ -69,6 +75,8 @@ module.exports = {
         'luxury': '0 10px 30px rgba(0, 0, 0, 0.1)',
         'luxury-hover': '0 20px 40px rgba(0, 0, 0, 0.15)',
         'gold': '0 4px 20px rgba(255, 215, 0, 0.3)',
+        'neon-gold': '0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700',
+        'neon-gold-hover': '0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700',
       },
     },
   },

@@ -10,11 +10,11 @@ export const Footer: React.FC = () => {
     {
       title: 'Shop',
       links: [
-        { label: 'New Arrivals', href: '/shop' },
-        { label: 'Clothing', href: '/shop' },
+        { label: 'Men', href: '/shop' },
+        { label: 'Women', href: '/shop' },
+        { label: 'Kids', href: '/shop' },
         { label: 'Accessories', href: '/shop' },
-        { label: 'AI Collection', href: '/ai-studio' },
-        { label: 'Sale', href: '/shop' },
+        { label: 'Trading', href: '/shop' },
       ],
     },
     {
@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
         { label: 'Membership', href: '/membership' },
         { label: 'Community', href: '/community' },
         { label: 'Gift Cards', href: '#' },
-        { label: 'VIP Membership', href: '/membership' },
+        { label: 'Play & Earn', href: '/#game-zone' },
       ],
     },
     {
@@ -55,35 +55,11 @@ export const Footer: React.FC = () => {
     { icon: <Share2 size={20} />, href: '#', label: 'Facebook' },
   ];
 
+  const paymentMethods = ['Visa', 'Mastercard', 'Amex', 'PayPal', 'Apple Pay', 'Google Pay'];
+
   return (
     <footer className="bg-primary-black text-white">
-      {/* Newsletter Section */}
-      <div className="border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center max-w-2xl mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="text-primary-gold" size={24} />
-              <h3 className="text-2xl font-bold font-montserrat">Stay in Style</h3>
-            </div>
-            <p className="text-gray-400 mb-6 font-poppins">
-              Get exclusive access to new AI-generated collections, luxury drops, and member-only offers.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input
-                placeholder="Enter your email"
-                type="email"
-                className="flex-1"
-              />
-              <Button variant="gold" size="lg">
-                Subscribe
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-1">
@@ -142,42 +118,26 @@ export const Footer: React.FC = () => {
             </div>
           ))}
         </div>
-
-        {/* Contact Information */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-400">
-            <div className="flex items-center gap-3">
-              <Mail size={18} className="text-primary-gold" />
-              <span className="font-poppins">support@dorodostyle.com</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone size={18} className="text-primary-gold" />
-              <span className="font-poppins">+1 (555) 123-4567</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <MapPin size={18} className="text-primary-gold" />
-              <span className="font-poppins">New York, NY 10001</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Bottom Bar */}
       <div className="border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-            <p className="font-poppins">
+            <p className="font-poppins mb-4 md:mb-0">
               © 2025 DORODOStyle. All rights reserved.
             </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
+            <div className="flex items-center gap-4 mb-4 md:mb-0">
+              {paymentMethods.map(method => (
+                <span key={method} className="font-poppins">{method}</span>
+              ))}
+            </div>
+            <div className="flex space-x-6">
               <Link to="#" className="hover:text-primary-gold transition-colors">
                 Terms & Conditions
               </Link>
               <Link to="#" className="hover:text-primary-gold transition-colors">
                 Privacy Policy
-              </Link>
-              <Link to="#" className="hover:text-primary-gold transition-colors">
-                Cookie Policy
               </Link>
             </div>
           </div>

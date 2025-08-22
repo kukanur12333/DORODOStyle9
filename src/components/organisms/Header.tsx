@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingBag, Heart, User, Menu, X, ChevronDown, Sparkles } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, X, ChevronDown, Sparkles, Gamepad2 } from 'lucide-react';
 import { Logo } from '../atoms/Logo';
 import { useApp } from '../../context/AppContext';
 import { MiniCart } from '../molecules/MiniCart';
@@ -36,6 +36,7 @@ export const Header: React.FC = () => {
       ],
     },
     { label: 'AI Studio', href: '/ai-studio', icon: <Sparkles size={16} /> },
+    { label: 'Rewards', href: '/rewards', icon: <Gamepad2 size={16} /> },
     { label: 'Promotions', href: '/promotions' },
     { label: 'Community', href: '/community' },
     { label: 'About', href: '/about' },
@@ -45,7 +46,7 @@ export const Header: React.FC = () => {
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Orders', href: '/orders' },
     { label: 'Wishlist', href: '/wishlist' },
-    { label: 'Rewards', href: '/membership' },
+    { label: 'Rewards', href: '/rewards' },
     { label: 'Settings', href: '/dashboard' },
     { label: 'Logout', href: '#' },
   ];

@@ -2,12 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { X, SlidersHorizontal } from 'lucide-react';
 import { Button } from '../atoms/Button';
-import { PRODUCT_CATEGORIES } from '../../utils/constants';
+import { PRODUCT_CATEGORIES, FILTER_COLORS } from '../../utils/constants';
 
 interface Filters {
   category: string;
   priceRange: [number, number];
   brand: string;
+  color: string;
   isAI: boolean;
   isLimited: boolean;
   inStock: boolean;
@@ -35,6 +36,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       category: '',
       priceRange: [0, 2000],
       brand: '',
+      color: '',
       isAI: false,
       isLimited: false,
       inStock: true,
@@ -140,6 +142,26 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 />
                 <span className="text-sm font-poppins">{brand}</span>
               </label>
+            ))}
+          </div>
+        </div>
+        
+        {/* Color */}
+        <div>
+          <h4 className="font-montserrat font-medium mb-3">Color</h4>
+          <div className="flex flex-wrap gap-3">
+            {FILTER_COLORS.map((color) => (
+              <button
+                key={color.name}
+                onClick={() => handleFilterChange('color', filters.color === color.name ? '' : color.name)}
+                className={`w-8 h-8 rounded-full border-2 transition-all ${
+                  filters.color === color.name
+                    ? 'ring-2 ring-offset-2 ring-primary-black'
+                    : 'border-gray-200'
+                }`}
+                style={{ backgroundColor: color.hex }}
+                aria-label={color.name}
+              />
             ))}
           </div>
         </div>

@@ -10,31 +10,38 @@ import { useApp } from '../../context/AppContext';
 export const TrendingProducts: React.FC = () => {
   const { state, dispatch } = useApp();
   const [products, setProducts] = useState<Product[]>([]);
-  const [width, setWidth] = useState(0);
-  const carousel = useRef<HTMLDivElement>(null);
+  const [animationWidth, setAnimationWidth] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const trendingProducts = generateMockProducts(8);
-    setProducts(trendingProducts);
+    // Duplicate products for a seamless loop
+    setProducts([...trendingProducts, ...trendingProducts]);
   }, []);
 
   useEffect(() => {
     const calculateWidth = () => {
-      if (carousel.current) {
-        setWidth(carousel.current.scrollWidth - carousel.current.offsetWidth);
+      if (carouselRef.current) {
+        // The animation should move by the width of the original set of products
+        const halfScrollWidth = carouselRef.current.scrollWidth / 2;
+        setAnimationWidth(halfScrollWidth);
       }
     };
-    
-    calculateWidth();
+
+    // Calculate width after products are rendered to ensure accuracy
+    const timer = setTimeout(calculateWidth, 100);
     window.addEventListener('resize', calculateWidth);
-    
-    return () => window.removeEventListener('resize', calculateWidth);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', calculateWidth);
+    };
   }, [products]);
 
   const handleAddToCart = (productId: string) => {
     dispatch({
       type: 'ADD_TO_CART',
-      payload: { productId, quantity: 1 }
+      payload: { productId, quantity: 1 },
     });
   };
 
@@ -44,12 +51,12 @@ export const TrendingProducts: React.FC = () => {
 
   return (
     <section className="py-20 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-16 px-4 sm:px-6 lg:px-8"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <Flame className="text-orange-500" size={24} />
@@ -62,16 +69,26 @@ export const TrendingProducts: React.FC = () => {
           </p>
         </motion.div>
 
-        <motion.div ref={carousel} className="cursor-grab" whileTap={{ cursor: "grabbing" }}>
+        <div className="overflow-hidden">
           <motion.div
-            drag="x"
-            dragConstraints={{ right: 0, left: -width }}
+            ref={carouselRef}
             className="flex gap-6 mb-12"
+            animate={{
+              x: [0, -animationWidth],
+            }}
+            transition={{
+              x: {
+                repeat: Infinity,
+                repeatType: 'loop',
+                duration: 50, // Slower duration for a smoother scroll
+                ease: 'linear',
+              },
+            }}
           >
-            {products.map((product) => (
-              <motion.div
-                key={product.id}
-                className="min-w-[280px] md:min-w-[320px]"
+            {products.map((product, index) => (
+              <div
+                key={`${product.id}-${index}`}
+                className="min-w-[280px] md:min-w-[320px] flex-shrink-0"
               >
                 <ProductCard
                   product={product}
@@ -79,16 +96,16 @@ export const TrendingProducts: React.FC = () => {
                   onToggleWishlist={handleToggleWishlist}
                   isWishlisted={state.wishlist.includes(product.id)}
                 />
-              </motion.div>
+              </div>
             ))}
           </motion.div>
-        </motion.div>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center"
+          className="text-center px-4 sm:px-6 lg:px-8"
         >
           <Button variant="outline" size="lg" className="group">
             View All Trending
